@@ -1,0 +1,13 @@
+# Ambientes virtuais
+venv/
+env/
+
+# Python cache (nunca suba isso!)
+__pycache__/
+*.py[cod]
+
+# Banco de dados local
+db.sqlite3
+
+# Arquivos de mídia (uploads de notas fiscais)
+media/
