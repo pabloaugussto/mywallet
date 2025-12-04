@@ -10,3 +10,12 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('nova/', views.nova_transacao, name='nova_transacao'), # Nova linha
 ]
+
+urlpatterns = [
+    path('', views.index, name='index'),
+    path('nova/', views.nova_transacao, name='nova_transacao'),
+    
+    # <int:pk> significa que o Django espera um número inteiro e vai chamá-lo de 'pk'
+    path('editar/<int:pk>/', views.editar_transacao, name='editar_transacao'),
+    path('excluir/<int:pk>/', views.excluir_transacao, name='excluir_transacao'),
+]

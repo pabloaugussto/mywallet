@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect  # <--- O erro estava aqui
+from django.shortcuts import render, redirect 
 from .models import Transacao
 from .forms import TransacaoForm
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 
 def index(request):
     # Busca todas as transações do banco
@@ -60,3 +61,28 @@ def index(request):
     }
     
     return render(request, 'financas/index.html', contexto)
+
+@login_required
+def editar_transacao(request, pk):
+    # Tenta buscar a transação com esse ID (pk). 
+    # O filtro usuario=request.user garante que ninguém edite a conta do vizinho!
+    transacao = get_object_or_404(Transacao, pk=pk, usuario=request.user)
+
+    if request.method == 'POST':
+        # Carrega o formulário com os dados que vieram da tela (request.POST) 
+        # E com a instância antiga (instance=transacao) para ele saber o que atualizar
+        form = TransacaoForm(request.POST, request.FILES, instance=transacao)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    else:
+        # Se for GET, carrega o formulário preenchido com os dados atuais
+        form = TransacaoForm(instance=transacao)
+
+    return render(request, 'financas/form.html', {'form': form})
+
+@login_required
+def excluir_transacao(request, pk):
+    transacao = get_object_or_404(Transacao, pk=pk, usuario=request.user)
+    transacao.delete()
+    return redirect('index')
