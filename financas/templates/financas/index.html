@@ -1,55 +1,333 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Minha Wallet</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MyWallet - Visão Geral</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <div class="container mt-5">
-        <h1>Minhas Finanças</h1>
-        <hr>
+    <style>
+      :root {
+        --nomad-yellow: #fece00;
+        --nomad-black: #111111;
+        --nomad-gray: #f5f5f5;
+        --text-gray: #666;
+      }
 
-        <div class="card">
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Categoria</th>
-                            <th>Valor</th>
-                            <th>Comp.</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in transacoes %}
-                        <tr>
-                            <td>{{ t.data }}</td>
-                            <td>{{ t.descricao }}</td>
-                            <td>{{ t.categoria }}</td>
-                            <td style="color: {% if t.categoria.tipo == 'D' %} red {% else %} green {% endif %}">
-                                R$ {{ t.valor }}
-                            </td>
-                            <td>
-                                {% if t.comprovante %}
-                                    <a href="{{ t.comprovante.url }}" target="_blank">Ver Foto</a>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5">Nenhuma transação cadastrada.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: var(--nomad-gray);
+        padding-bottom: 40px;
+      }
+
+      /* --- NAVBAR ESTILO APP --- */
+      .navbar-custom {
+        background-color: var(--nomad-black);
+        padding: 15px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        color: white !important;
+        letter-spacing: 1px;
+        font-size: 1.4rem;
+      }
+
+      .user-profile {
+        color: white;
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .btn-logout {
+        color: var(--nomad-yellow);
+        border: 1px solid var(--nomad-yellow);
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.8rem;
+        text-decoration: none;
+        margin-left: 10px;
+        transition: all 0.3s;
+      }
+
+      .btn-logout:hover {
+        background-color: var(--nomad-yellow);
+        color: var(--nomad-black);
+      }
+
+      /* --- CARDS DE RESUMO --- */
+      .summary-section {
+        margin-top: -30px; /* Sobe um pouco para cima do bg cinza se quiséssemos um header maior */
+        margin-bottom: 30px;
+      }
+
+      .card-summary {
+        border: none;
+        border-radius: 16px;
+        background-color: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+        overflow: hidden;
+        height: 100%;
+      }
+
+      .card-summary:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-summary .card-body {
+        padding: 25px;
+        position: relative;
+      }
+
+      .summary-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-gray);
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .summary-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--nomad-black);
+      }
+
+      /* Ícone decorativo no fundo do card */
+      .card-icon-bg {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        font-size: 5rem;
+        opacity: 0.05;
+        color: var(--nomad-black);
+      }
+
+      /* Cores específicas para os valores */
+      .text-income {
+        color: #198754;
+      }
+      .text-expense {
+        color: #dc3545;
+      }
+
+      /* --- Tabela e Ações --- */
+      .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--nomad-black);
+      }
+
+      /* Botão Amarelo Principal */
+      .btn-new-transaction {
+        background-color: var(--nomad-black);
+        color: white; /* Contraste preto no botão para ficar chique */
+        font-weight: 600;
+        padding: 10px 25px;
+        border-radius: 30px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+
+      .btn-new-transaction:hover {
+        background-color: var(--nomad-yellow);
+        color: var(--nomad-black);
+      }
+
+      .table-card {
+        background: white;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden; /* Arredonda a tabela */
+      }
+
+      .table thead th {
+        background-color: white;
+        border-bottom: 2px solid #f0f0f0;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding: 15px 20px;
+      }
+
+      .table tbody td {
+        padding: 15px 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f8f8f8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+      }
+
+      .badge-category {
+        background-color: #f0f0f0;
+        color: #555;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-custom mb-5">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet
+        </a>
+        <div class="d-flex align-items-center">
+          <span class="user-profile me-3"
+            >Olá, <strong>{{ request.user.username }}</strong></span
+          >
+          <a href="{% url 'logout' %}" class="btn-logout">Sair</a>
         </div>
-    </div>
+      </div>
+    </nav>
 
-</body>
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+          <div class="card-summary">
+            <div class="card-body">
+              <span class="summary-label">Entradas Totais</span>
+              <div class="summary-value text-income">
+                R$ {{ total_receitas }}
+              </div>
+              <i class="bi bi-arrow-up-circle card-icon-bg"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <div class="card-summary">
+            <div class="card-body">
+              <span class="summary-label">Saídas Totais</span>
+              <div class="summary-value text-expense">
+                R$ {{ total_despesas }}
+              </div>
+              <i class="bi bi-arrow-down-circle card-icon-bg"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <div
+            class="card-summary"
+            style="background-color: var(--nomad-black); color: white"
+          >
+            <div class="card-body">
+              <span class="summary-label" style="color: #aaa"
+                >Saldo Global</span
+              >
+              <div class="summary-value" style="color: var(--nomad-yellow)">
+                R$ {{ saldo }}
+              </div>
+              <i
+                class="bi bi-wallet2 card-icon-bg"
+                style="color: white; opacity: 0.1"
+              ></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <h4 class="section-title">Últimas Movimentações</h4>
+        <a href="{% url 'nova_transacao' %}" class="btn-new-transaction">
+          <i class="bi bi-plus-lg"></i> Nova Transação
+        </a>
+      </div>
+
+      <div class="card table-card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Valor</th>
+                  <th>Comprovante</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for t in transacoes %}
+                <tr>
+                  <td>
+                    <span class="fw-bold">{{ t.data|date:"d M" }}</span>
+                    <br />
+                    <small class="text-muted">{{ t.data|date:"Y" }}</small>
+                  </td>
+                  <td>
+                    {{ t.descricao }} {% if t.observacoes %}
+                    <i
+                      class="bi bi-info-circle text-muted ms-1"
+                      title="{{ t.observacoes }}"
+                    ></i>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge-category">{{ t.categoria }}</span>
+                  </td>
+                  <td
+                    style="font-weight: 700; color: {% if t.categoria.tipo == 'D' %}#dc3545{% else %}#198754{% endif %}"
+                  >
+                    {% if t.categoria.tipo == 'D' %}-{% else %}+{% endif %} R$
+                    {{ t.valor }}
+                  </td>
+                  <td>
+                    {% if t.comprovante %}
+                    <a
+                      href="{{ t.comprovante.url }}"
+                      target="_blank"
+                      class="text-decoration-none"
+                    >
+                      <i class="bi bi-paperclip"></i> Ver
+                    </a>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                    Nenhuma transação encontrada.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
