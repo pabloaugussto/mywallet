@@ -36,5 +36,11 @@ class Transacao(models.Model):
     # on_delete=models.CASCADE: se apagar o usuário, apaga todas as transações dele
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    OPCOES_MOEDA = (
+        ('BRL', 'Real (R$)'),
+        ('USD', 'Dólar (US$)'),
+    )
+    moeda = models.CharField(max_length=3, choices=OPCOES_MOEDA, default='BRL')
+
     def __str__(self):
         return self.descricao

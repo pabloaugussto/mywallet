@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>MyWallet - Visão Geral</title>
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -17,6 +18,16 @@
     />
 
     <style>
+    .ticker-bar {
+    background-color: var(--nomad-yellow); 
+    color: var(--nomad-black);             
+    font-size: 0.85rem;                    
+    padding: 5px 0;                        
+    font-weight: 700;                      
+    text-align: center;                    
+    letter-spacing: 0.5px;
+    }
+
       :root {
         --nomad-yellow: #fece00;
         --nomad-black: #111111;
@@ -68,7 +79,6 @@
 
       /* --- CARDS DE RESUMO --- */
       .summary-section {
-        margin-top: -30px; /* Sobe um pouco para cima do bg cinza se quiséssemos um header maior */
         margin-bottom: 30px;
       }
 
@@ -141,7 +151,7 @@
       /* Botão Amarelo Principal */
       .btn-new-transaction {
         background-color: var(--nomad-black);
-        color: white; /* Contraste preto no botão para ficar chique */
+        color: white;
         font-weight: 600;
         padding: 10px 25px;
         border-radius: 30px;
@@ -150,6 +160,7 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s;
+        text-decoration: none;
       }
 
       .btn-new-transaction:hover {
@@ -162,7 +173,7 @@
         border-radius: 16px;
         border: none;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        overflow: hidden; /* Arredonda a tabela */
+        overflow: hidden;
       }
 
       .table thead th {
@@ -195,23 +206,34 @@
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-custom mb-5">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet
-            </a>
-            <div class="d-flex align-items-center">
-                <span class="user-profile me-3">Olá, <strong>{{ request.user.username }}</strong></span>
-                
-                <form action="{% url 'logout' %}" method="post" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn-logout" style="background: transparent; cursor: pointer;">
-                        Sair
-                    </button>
-                </form>
-
-            </div>
+    <div class="ticker-bar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-graph-up-arrow me-1"></i> Mercado Hoje</span>
+            <span>USD/BRL: <strong>R$ {{ cotacao_atual|floatformat:2 }}</strong></span>
         </div>
+    </div>
+    <nav class="navbar navbar-custom mb-5">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet
+        </a>
+        <div class="d-flex align-items-center">
+          <span class="user-profile me-3"
+            >Olá, <strong>{{ request.user.username }}</strong></span
+          >
+
+          <form action="{% url 'logout' %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn-logout"
+              style="background: transparent; cursor: pointer"
+            >
+              Sair
+            </button>
+          </form>
+        </div>
+      </div>
     </nav>
 
     <div class="container">
@@ -221,7 +243,7 @@
             <div class="card-body">
               <span class="summary-label">Entradas Totais</span>
               <div class="summary-value text-income">
-                R$ {{ total_receitas }}
+                R$ {{ receitas|floatformat:2 }}
               </div>
               <i class="bi bi-arrow-up-circle card-icon-bg"></i>
             </div>
@@ -233,7 +255,7 @@
             <div class="card-body">
               <span class="summary-label">Saídas Totais</span>
               <div class="summary-value text-expense">
-                R$ {{ total_despesas }}
+                R$ {{ despesas|floatformat:2 }}
               </div>
               <i class="bi bi-arrow-down-circle card-icon-bg"></i>
             </div>
@@ -250,7 +272,7 @@
                 >Saldo Global</span
               >
               <div class="summary-value" style="color: var(--nomad-yellow)">
-                R$ {{ saldo }}
+                R$ {{ saldo|floatformat:2 }}
               </div>
               <i
                 class="bi bi-wallet2 card-icon-bg"
@@ -278,10 +300,7 @@
                   <th>Descrição</th>
                   <th>Categoria</th>
                   <th>Valor</th>
-                  <th>Comprovante</th>
-                  <th>Valor</th>
-                  <th>Comprovante</th>
-                  <th class="text-end">Ações</th> </tr>
+                  <th class="text-end">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -304,23 +323,144 @@
                     <span class="badge-category">{{ t.categoria }}</span>
                   </td>
                   <td
-                    style="font-weight: 700; color: {% if t.categoria.tipo == 'D' %}#dc3545{% else %}#198754{% endif %}"
-                  >
-                    {% if t.categoria.tipo == 'D' %}-{% else %}+{% endif %} R$
-                    {{ t.valor }}
+                    style="font-weight: 700; color: {% if t.categoria.tipo == 'D' %}#dc3545{% else %}#198754{% endif %}" {% if t.categoria.tipo == 'D' %}-{% else %}+{% endif %} {% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor }}
+                  >            
                   </td>
-                  <td>
-                    {% if t.comprovante %}
-                    <a
-                      href="{{ t.comprovante.url }}"
-                      target="_blank"
-                      class="text-decoration-none"
+
+                  <td class="text-end">
+                    <button
+                      class="btn btn-sm btn-light rounded-circle"
+                      type="button"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasRight-{{ t.id }}"
+                      aria-controls="offcanvasRight"
                     >
-                      <i class="bi bi-paperclip"></i> Ver
-                    </a>
-                    {% else %}
-                    <span class="text-muted">-</span>
-                    {% endif %}
+                      <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+
+                    <div
+                      class="offcanvas offcanvas-end text-bg-dark"
+                      tabindex="-1"
+                      id="offcanvasRight-{{ t.id }}"
+                      aria-labelledby="offcanvasRightLabel"
+                      style="border-left: 1px solid #333; text-align: left"
+                    >
+                      <div
+                        class="offcanvas-header border-bottom border-secondary"
+                      >
+                        <h5
+                          class="offcanvas-title fw-bold"
+                          id="offcanvasRightLabel"
+                        >
+                          <i class="bi bi-wallet2 text-warning me-2"></i>
+                          Detalhes
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close btn-close-white"
+                          data-bs-dismiss="offcanvas"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+
+                      <div class="offcanvas-body">
+                        <div class="text-center mb-4 mt-3">
+                          <small class="text-secondary text-uppercase fw-bold"
+                            >Valor da Transação</small
+                          >
+                          <h1 class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
+    
+                          {% if t.moeda == 'USD' %}
+                          US$
+                         {% else %}
+                              R$
+                         {% endif %}
+                          
+                        {{ t.valor }}
+                         </h1>
+                          <span class="badge bg-secondary mt-2"
+                            >{{ t.categoria.nome }}</span
+                          >
+                        </div>
+
+                        <hr class="border-secondary" />
+
+                        <div class="mb-4">
+                          <label
+                            class="text-secondary small text-uppercase fw-bold"
+                            >Descrição</label
+                          >
+                          <p class="fs-5">{{ t.descricao }}</p>
+                        </div>
+
+                        <div class="mb-4">
+                          <label
+                            class="text-secondary small text-uppercase fw-bold"
+                            >Data</label
+                          >
+                          <p class="fs-5">
+                            {{ t.data|date:"d \d\e F \d\e Y" }}
+                          </p>
+                        </div>
+
+                        {% if t.observacoes %}
+                        <div
+                          class="mb-4 p-3 rounded"
+                          style="background-color: #1a1a1a"
+                        >
+                          <label
+                            class="text-secondary small text-uppercase fw-bold mb-1"
+                            ><i class="bi bi-card-text me-1"></i>
+                            Observações</label
+                          >
+                          <p class="mb-0 text-light fst-italic">
+                            "{{ t.observacoes }}"
+                          </p>
+                        </div>
+                        {% endif %} {% if t.comprovante %}
+                        <div class="mb-5">
+                          <label
+                            class="text-secondary small text-uppercase fw-bold mb-2"
+                            >Comprovante</label
+                          >
+                          <a
+                            href="{{ t.comprovante.url }}"
+                            target="_blank"
+                            class="btn btn-outline-light w-100 py-3 rounded-pill"
+                          >
+                            <i class="bi bi-paperclip me-2"></i> Visualizar
+                            Anexo
+                          </a>
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-auto">
+                          <hr class="border-secondary" />
+                          <p
+                            class="text-secondary small text-uppercase fw-bold mb-3"
+                          >
+                            Gerenciar Transação
+                          </p>
+
+                          <div class="d-grid gap-2">
+                            <a
+                              href="{% url 'editar_transacao' t.id %}"
+                              class="btn btn-warning fw-bold py-3 text-dark rounded-pill"
+                            >
+                              <i class="bi bi-pencil me-2"></i> Editar Dados
+                            </a>
+
+                            <a
+                              href="{% url 'excluir_transacao' t.id %}"
+                              class="btn btn-outline-danger fw-bold py-3 rounded-pill"
+                              onclick="return confirm('Tem certeza que deseja apagar essa transação?');"
+                            >
+                              <i class="bi bi-trash me-2"></i> Excluir
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 {% empty %}
@@ -331,117 +471,6 @@
                   </td>
                 </tr>
                 {% endfor %}
-                <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Descrição</th>
-                                <th>Categoria</th>
-                                <th>Valor</th>
-                                <th>Comprovante</th>
-                                <th class="text-end">Ações</th> </tr>
-                                </thead>
-                  <tbody>
-                    {% for t in transacoes %}
-                    <tr>
-                        <td>
-                            <span class="fw-bold">{{ t.data|date:"d M" }}</span>
-                            <br>
-                            <small class="text-muted">{{ t.data|date:"Y" }}</small>
-                        </td>
-                        <td>
-                            {{ t.descricao }}
-                        </td>
-                        <td>
-                            <span class="badge-category">{{ t.categoria }}</span>
-                        </td>
-                        <td style="font-weight: 700; color: {% if t.categoria.tipo == 'D' %}#dc3545{% else %}#198754{% endif %}">
-                            {% if t.categoria.tipo == 'D' %}-{% else %}+{% endif %} R$ {{ t.valor }}
-                        </td>
-                        
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight-{{ t.id }}" aria-controls="offcanvasRight">
-                                <i class="bi bi-three-dots-vertical"></i>
-                            </button>
-
-                            <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasRight-{{ t.id }}" aria-labelledby="offcanvasRightLabel" style="border-left: 1px solid #333;">
-                                
-                                <div class="offcanvas-header border-bottom border-secondary">
-                                    <h5 class="offcanvas-title fw-bold" id="offcanvasRightLabel">
-                                        <i class="bi bi-wallet2 text-warning me-2"></i> Detalhes
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                                </div>
-                                
-                                <div class="offcanvas-body">
-                                    
-                                    <div class="text-center mb-4 mt-3">
-                                        <small class="text-secondary text-uppercase fw-bold">Valor da Transação</small>
-                                        <h1 class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
-                                            R$ {{ t.valor }}
-                                        </h1>
-                                        <span class="badge bg-secondary mt-2">{{ t.categoria.nome }}</span>
-                                    </div>
-
-                                    <hr class="border-secondary">
-
-                                    <div class="mb-4">
-                                        <label class="text-secondary small text-uppercase fw-bold">Descrição</label>
-                                        <p class="fs-5">{{ t.descricao }}</p>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label class="text-secondary small text-uppercase fw-bold">Data</label>
-                                        <p class="fs-5">{{ t.data|date:"d \d\e F \d\e Y" }}</p>
-                                    </div>
-
-                                    {% if t.observacoes %}
-                                    <div class="mb-4 p-3 rounded" style="background-color: #1a1a1a;">
-                                        <label class="text-secondary small text-uppercase fw-bold mb-1"><i class="bi bi-card-text me-1"></i> Observações</label>
-                                        <p class="mb-0 text-light fst-italic">"{{ t.observacoes }}"</p>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if t.comprovante %}
-                                    <div class="mb-5">
-                                        <label class="text-secondary small text-uppercase fw-bold mb-2">Comprovante</label>
-                                        <a href="{{ t.comprovante.url }}" target="_blank" class="btn btn-outline-light w-100 py-3 rounded-pill">
-                                            <i class="bi bi-paperclip me-2"></i> Visualizar Anexo
-                                        </a>
-                                    </div>
-                                    {% endif %}
-
-                                    <div class="mt-auto">
-                                        <hr class="border-secondary">
-                                        <p class="text-secondary small text-uppercase fw-bold mb-3">Gerenciar Transação</p>
-                                        
-                                        <div class="d-grid gap-2">
-                                            <a href="{% url 'editar_transacao' t.id %}" class="btn btn-warning fw-bold py-3 text-dark rounded-pill">
-                                                <i class="bi bi-pencil me-2"></i> Editar Dados
-                                            </a>
-                                            
-                                            <a href="{% url 'excluir_transacao' t.id %}" 
-                                               class="btn btn-outline-danger fw-bold py-3 rounded-pill"
-                                               onclick="return confirm('Tem certeza que deseja apagar essa transação?');">
-                                                <i class="bi bi-trash me-2"></i> Excluir
-                                            </a>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                            </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                            Nenhuma transação encontrada.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                    </table>
               </tbody>
             </table>
           </div>
