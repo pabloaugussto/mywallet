@@ -11,7 +11,7 @@ from .forms import TransacaoForm
 
 @login_required
 def index(request):
-    # --- 1. Filtros de Data ---
+    # 1. Filtros de Data
     hoje = datetime.now()
     try:
         mes_atual = int(request.GET.get('mes', hoje.month))
@@ -20,14 +20,13 @@ def index(request):
         mes_atual = hoje.month
         ano_atual = hoje.year
 
-    # Filtra as transações apenas deste mês/ano
     transacoes_do_mes = Transacao.objects.filter(
         data__month=mes_atual, 
         data__year=ano_atual,
-        usuario=request.user  # Garante que só vê as suas contas
+        usuario=request.user
     )
 
-    # --- 2. Cotação do Dólar ---
+    # 2. Cotação do Dólar
     cotacao_dolar = 6.00 
     try:
         response = requests.get('https://economia.awesomeapi.com.br/last/USD-BRL', timeout=2)
@@ -37,37 +36,37 @@ def index(request):
     except:
         pass 
 
-    # --- 3. Totais (Receita vs Despesa) ---
-    # Soma Receitas (R e USD convertidos)
+    # 3. Totais
+    # Receitas
     receitas_brl = float(transacoes_do_mes.filter(categoria__tipo='R', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
     receitas_usd = float(transacoes_do_mes.filter(categoria__tipo='R', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
     total_receitas = receitas_brl + (receitas_usd * cotacao_dolar)
 
-    # Soma Despesas (R e USD convertidos)
+    # Despesas
     despesas_brl = float(transacoes_do_mes.filter(categoria__tipo='D', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
     despesas_usd = float(transacoes_do_mes.filter(categoria__tipo='D', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
     total_despesas = despesas_brl + (despesas_usd * cotacao_dolar)
 
+    # --- CÁLCULOS FINAIS ---
     saldo = total_receitas - total_despesas
+    
+    # NOVO: Saldo puro em Dólar (para o cartão azul)
+    saldo_usd_original = receitas_usd - despesas_usd
 
-    # --- 4. Gráfico e Tabela ---
+    # 4. Gráfico e Tabela
     transacoes = transacoes_do_mes.order_by('-data')
     
     dados_grafico = {} 
     
-    # LÓGICA DO GRÁFICO (Convertendo Dólar e Filtrando Despesa)
     for t in transacoes_do_mes:
-        if t.categoria.tipo == 'D':  # Só entra se for Despesa
+        if t.categoria.tipo == 'D':
             valor_real = float(t.valor)
-            
-            if t.moeda == 'USD':     # Só converte se for Dólar
+            if t.moeda == 'USD':
                 valor_real = valor_real * cotacao_dolar
             
             nome = t.categoria.nome
-            # Soma no acumulador
             dados_grafico[nome] = dados_grafico.get(nome, 0) + valor_real
 
-    # Transforma em listas para o HTML
     lista_categorias = []
     lista_valores = []
     
@@ -75,7 +74,6 @@ def index(request):
         lista_categorias.append(f"{nome} - R$ {valor:.2f}")
         lista_valores.append(valor)
 
-    # Listas para o Filtro
     meses = [
         (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'Março'), (4, 'Abril'),
         (5, 'Maio'), (6, 'Junho'), (7, 'Julho'), (8, 'Agosto'),
@@ -87,6 +85,7 @@ def index(request):
         'receitas': total_receitas,
         'despesas': total_despesas,
         'saldo': saldo,
+        'saldo_usd': saldo_usd_original,  # <--- AQUI ESTÁ A NOVIDADE
         'transacoes': transacoes,
         'cotacao_atual': cotacao_dolar,
         'grafico_labels': json.dumps(lista_categorias), 

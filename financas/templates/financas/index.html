@@ -239,46 +239,49 @@
     </nav>
 
     <div class="container mb-4">
-    <div class="card border-0 shadow-sm">
+      <div class="card border-0 shadow-sm">
         <div class="card-body py-3">
-            <form method="get" class="row align-items-center justify-content-center g-3">
-                <div class="col-auto">
-                    <label class="fw-bold text-muted me-2">Filtrar período:</label>
-                </div>
-                
-                <div class="col-auto">
-                    <select name="mes" class="form-select border-secondary">
-                        {% for num, nome in lista_meses %}
-                            <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %}>
-                                {{ nome }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+          <form
+            method="get"
+            class="row align-items-center justify-content-center g-3"
+          >
+            <div class="col-auto">
+              <label class="fw-bold text-muted me-2">Filtrar período:</label>
+            </div>
 
-                <div class="col-auto">
-                    <select name="ano" class="form-select border-secondary">
-                        {% for ano in lista_anos %}
-                            <option value="{{ ano }}" {% if ano == ano_atual %}selected{% endif %}>
-                                {{ ano }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="col-auto">
+              <select name="mes" class="form-select border-secondary">
+                {% for num, nome in lista_meses %}
+                <option value="{{ num }}" {% if num == mes_atual %}selected{% endif %}>
+                  {{ nome }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
 
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-dark px-4 rounded-pill">
-                        <i class="bi bi-filter"></i> Atualizar
-                    </button>
-                </div>
-            </form>
+            <div class="col-auto">
+              <select name="ano" class="form-select border-secondary">
+                {% for ano in lista_anos %}
+                <option value="{{ ano }}" {% if ano == ano_atual %}selected{% endif %}>
+                  {{ ano }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-auto">
+              <button type="submit" class="btn btn-dark px-4 rounded-pill">
+                <i class="bi bi-filter"></i> Atualizar
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
-</div>
 
     <div class="container">
       <div class="row mb-5">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div class="card-summary">
             <div class="card-body">
               <span class="summary-label">Entradas Totais</span>
@@ -290,7 +293,7 @@
           </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div class="card-summary">
             <div class="card-body">
               <span class="summary-label">Saídas Totais</span>
@@ -302,14 +305,14 @@
           </div>
         </div>
 
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <div
             class="card-summary"
             style="background-color: var(--nomad-black); color: white"
           >
             <div class="card-body">
               <span class="summary-label" style="color: #aaa"
-                >Saldo Global</span
+                >Saldo Global (R$)</span
               >
               <div class="summary-value" style="color: var(--nomad-yellow)">
                 R$ {{ saldo|floatformat:2 }}
@@ -321,6 +324,19 @@
             </div>
           </div>
         </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card-summary" style="background-color: #0d6efd; color: white">
+              <div class="card-body">
+                <span class="summary-label" style="color: #e0e0e0">Saldo em Dólar</span>
+                <div class="summary-value text-white">
+                  US$ {{ saldo_usd|floatformat:2 }}
+                </div>
+                <i class="bi bi-globe-americas card-icon-bg" style="color: white; opacity: 0.2"></i>
+              </div>
+            </div>
+          </div>
+
       </div>
       <div class="row mb-5">
         <div class="col-md-6 offset-md-3">
@@ -383,8 +399,11 @@
                   </td>
                   <td>
                     <span class="badge-category">{{ t.categoria }}</span>
-                 </td>
-                  <td class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">{% if t.moeda == 'USD' %}US${% else %}R${% endif %} {{ t.valor|floatformat:2 }}         
+                  </td>
+                  <td
+                    class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}"
+                  >
+                    {% if t.moeda == 'USD' %}US${% else %}R${% endif %} {{ t.valor|floatformat:2 }}
                   </td>
                   <td class="text-end">
                     <button
@@ -430,8 +449,7 @@
                           <h1
                             class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}"
                           >
-                            {% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor }}
-                           
+                            {% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor|floatformat:2 }}
                           </h1>
                           <span class="badge bg-secondary mt-2"
                             >{{ t.categoria.nome }}</span
@@ -575,34 +593,42 @@
       });
     </script>
     {% if messages %}
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  {% for message in messages %}
-  <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="d-flex">
-      <div class="toast-body fw-bold">
-        {% if message.tags == 'success' %}
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      {% for message in messages %}
+      <div
+        class="toast align-items-center text-bg-{{ message.tags }} border-0"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body fw-bold">
+            {% if message.tags == 'success' %}
             <i class="bi bi-check-circle-fill me-2"></i>
-        {% elif message.tags == 'error' %}
+            {% elif message.tags == 'error' %}
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {% endif %}
-        {{ message }}
+            {% endif %} {{ message }}
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      {% endfor %}
     </div>
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
+    {% endif %}
 
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
-    var toastList = toastElList.map(function(toastEl) {
-      // Cria o toast e manda mostrar (show)
-      return new bootstrap.Toast(toastEl).show() 
-    })
-  });
-</script>
-
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var toastElList = [].slice.call(document.querySelectorAll(".toast"));
+        var toastList = toastElList.map(function (toastEl) {
+          // Cria o toast e manda mostrar (show)
+          return new bootstrap.Toast(toastEl).show();
+        });
+      });
+    </script>
   </body>
 </html>
