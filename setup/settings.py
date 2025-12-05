@@ -121,3 +121,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'login'
+
+# --- CONFIGURAÇÕES DE LOGIN ---
+# Se não estiver logado, manda para o login do Admin
+LOGIN_URL = '/admin/login/'
+
+# Depois de logar, manda de volta para a Home do site
+LOGIN_REDIRECT_URL = '/'
