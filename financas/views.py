@@ -1,13 +1,14 @@
 import requests
 import json
 import yfinance as yf
+from django import forms
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Transacao, Investimento
-from .forms import TransacaoForm
+from .forms import TransacaoForm, InvestimentoForm
 
 @login_required
 def index(request):
@@ -92,6 +93,7 @@ def index(request):
                 total_investido += valor_atual
                 
                 lista_investimentos.append({
+                    'id_investimento': inv.id,
                     'simbolo': inv.simbolo,
                     'qtd': inv.quantidade,
                     'preco': cotacao_atual,
@@ -178,3 +180,20 @@ def excluir_transacao(request, pk):
     transacao.delete()
     messages.success(request, 'Transação removida!')
     return redirect('index')
+
+class InvestimentoForm(forms.ModelForm):
+    class Meta:
+        model = Investimento
+        fields = ['simbolo', 'quantidade']
+
+@login_required
+def editar_investimento(request, pk):
+    investimento = get_object_or_404(Investimento, pk=pk)
+    form = InvestimentoForm(request.POST or None, instance=investimento)
+    
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Investimento atualizado!')
+        return redirect('index')
+    
+    return render(request, 'financas/form.html', {'form': form})

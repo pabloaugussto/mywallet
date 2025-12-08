@@ -331,61 +331,68 @@
         </div>
       </div>
 
-      {% if lista_investimentos %}
+{% if lista_investimentos %}
       <div class="row mb-5">
         <div class="col-12">
-          <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border-radius: 16px;">
+          <div class="card shadow-sm" style="background-color: #111111; border: 1px solid #333; border-radius: 16px;">
             <div class="card-body p-4">
+              
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                  <h4 class="fw-bold mb-1">
+                  <h4 class="fw-bold mb-1 text-white">
                     <i class="bi bi-graph-up-arrow text-warning me-2"></i>
-                    Meus Investimentos
+                    Carteira de Investimentos
                   </h4>
-                  <small class="text-white-50">Cotações atualizadas em tempo real (Yahoo Finance)</small>
+                  <small class="text-secondary">Renda Fixa & Yahoo Finance</small>
                 </div>
                 <div class="text-end">
-                  <span class="d-block small text-white-50 text-uppercase fw-bold">Patrimônio Investido</span>
-                  <span class="display-6 fw-bold text-warning">R$ {{ total_investido|floatformat:2 }}</span>
+                  <span class="d-block small text-secondary text-uppercase fw-bold">Patrimônio Total</span>
+                  <span class="fs-2 fw-bold text-warning">R$ {{ total_investido|floatformat:2 }}</span>
                 </div>
               </div>
 
               <div class="table-responsive">
-                <table class="table table-borderless text-white mb-0" style="--bs-table-bg: transparent; --bs-table-color: white">
-                  <thead style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.85rem; text-transform: uppercase;">
+                <div class="table-responsive">
+                <table class="table mb-0" style="background-color: transparent !important; --bs-table-bg: transparent;">
+                  <thead style="border-bottom: 1px solid #333; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
                     <tr>
-                      <th class="text-white-50">Ativo / Ticker</th>
-                      <th class="text-white-50">Quantidade</th>
-                      <th class="text-white-50">Preço Atual</th>
-                      <th class="text-end text-white-50">Saldo Total</th>
-                    </tr>
+                      <th class="text-secondary py-3 border-0">Ativo</th>
+                      <th class="text-secondary py-3 border-0">Qtd.</th>
+                      <th class="text-secondary py-3 border-0">Cotação</th>
+                      <th class="text-end text-secondary py-3 border-0">Total</th>
+                      <th class="text-end text-secondary py-3 border-0" style="width: 50px;"></th> </tr>
                   </thead>
                   <tbody>
                     {% for inv in lista_investimentos %}
-                    <tr>
-                      <td class="align-middle">
-                        <span class="fw-bold fs-5">{{ inv.simbolo }}</span>
+                    <tr style="border-bottom: 1px solid #222;">
+                      <td class="py-3 border-0">
+                        <span class="fw-bold fs-5 text-white">{{ inv.simbolo }}</span>
                       </td>
-                      <td class="align-middle text-white-50">
-                        {{ inv.qtd }}
+                      <td class="py-3 border-0">
+                        <span class="text-secondary">{{ inv.qtd|floatformat:2 }}</span>
                       </td>
-                      <td class="align-middle">
-                        R$ {{ inv.preco|floatformat:2 }}
+                      <td class="py-3 border-0">
+                        <span class="text-secondary">R$ {{ inv.preco|floatformat:2 }}</span>
                       </td>
-                      <td class="text-end align-middle">
+                      <td class="text-end py-3 border-0">
                         <span class="fw-bold fs-5 text-warning">R$ {{ inv.total|floatformat:2 }}</span>
+                      </td>
+                      <td class="text-end py-3 border-0">
+                        <a href="{% url 'editar_investimento' inv.id_investimento %}" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                        </a>
                       </td>
                     </tr>
                     {% endfor %}
                   </tbody>
                 </table>
               </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       {% endif %}
-
       <div class="actions-bar">
         <h4 class="section-title">Últimas Movimentações</h4>
         <a href="{% url 'nova_transacao' %}" class="btn-new-transaction">
