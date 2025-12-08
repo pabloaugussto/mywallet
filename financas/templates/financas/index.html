@@ -209,28 +209,20 @@
     <div class="ticker-bar">
       <div class="container d-flex justify-content-between align-items-center">
         <span><i class="bi bi-graph-up-arrow me-1"></i> Mercado Hoje</span>
-        <span
-          >USD/BRL: <strong>R$ {{ cotacao_atual|floatformat:2 }}</strong></span
-        >
+        <span>USD/BRL: <strong>R$ {{ cotacao_atual|floatformat:2 }}</strong></span>
       </div>
     </div>
+
     <nav class="navbar navbar-custom mb-5">
       <div class="container">
         <a class="navbar-brand" href="#">
           <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet
         </a>
         <div class="d-flex align-items-center">
-          <span class="user-profile me-3"
-            >Olá, <strong>{{ request.user.username }}</strong></span
-          >
-
+          <span class="user-profile me-3">Olá, <strong>{{ request.user.username }}</strong></span>
           <form action="{% url 'logout' %}" method="post" class="d-inline">
             {% csrf_token %}
-            <button
-              type="submit"
-              class="btn-logout"
-              style="background: transparent; cursor: pointer"
-            >
+            <button type="submit" class="btn-logout" style="background: transparent; cursor: pointer">
               Sair
             </button>
           </form>
@@ -241,14 +233,10 @@
     <div class="container mb-4">
       <div class="card border-0 shadow-sm">
         <div class="card-body py-3">
-          <form
-            method="get"
-            class="row align-items-center justify-content-center g-3"
-          >
+          <form method="get" class="row align-items-center justify-content-center g-3">
             <div class="col-auto">
               <label class="fw-bold text-muted me-2">Filtrar período:</label>
             </div>
-
             <div class="col-auto">
               <select name="mes" class="form-select border-secondary">
                 {% for num, nome in lista_meses %}
@@ -258,7 +246,6 @@
                 {% endfor %}
               </select>
             </div>
-
             <div class="col-auto">
               <select name="ano" class="form-select border-secondary">
                 {% for ano in lista_anos %}
@@ -268,7 +255,6 @@
                 {% endfor %}
               </select>
             </div>
-
             <div class="col-auto">
               <button type="submit" class="btn btn-dark px-4 rounded-pill">
                 <i class="bi bi-filter"></i> Atualizar
@@ -306,38 +292,30 @@
         </div>
 
         <div class="col-md-3 mb-3">
-          <div
-            class="card-summary"
-            style="background-color: var(--nomad-black); color: white"
-          >
+          <div class="card-summary" style="background-color: var(--nomad-black); color: white">
             <div class="card-body">
-              <span class="summary-label" style="color: #aaa"
-                >Saldo Global (R$)</span
-              >
+              <span class="summary-label" style="color: #aaa">Saldo Global (R$)</span>
               <div class="summary-value" style="color: var(--nomad-yellow)">
                 R$ {{ saldo|floatformat:2 }}
               </div>
-              <i
-                class="bi bi-wallet2 card-icon-bg"
-                style="color: white; opacity: 0.1"
-              ></i>
+              <i class="bi bi-wallet2 card-icon-bg" style="color: white; opacity: 0.1"></i>
             </div>
           </div>
         </div>
 
         <div class="col-md-3 mb-3">
-            <div class="card-summary" style="background-color: #0d6efd; color: white">
-              <div class="card-body">
-                <span class="summary-label" style="color: #e0e0e0">Saldo em Dólar</span>
-                <div class="summary-value text-white">
-                  US$ {{ saldo_usd|floatformat:2 }}
-                </div>
-                <i class="bi bi-globe-americas card-icon-bg" style="color: white; opacity: 0.2"></i>
+          <div class="card-summary" style="background-color: #0d6efd; color: white">
+            <div class="card-body">
+              <span class="summary-label" style="color: #e0e0e0">Saldo em Dólar</span>
+              <div class="summary-value text-white">
+                US$ {{ saldo_usd|floatformat:2 }}
               </div>
+              <i class="bi bi-globe-americas card-icon-bg" style="color: white; opacity: 0.2"></i>
             </div>
           </div>
-
+        </div>
       </div>
+
       <div class="row mb-5">
         <div class="col-md-6 offset-md-3">
           <div class="card shadow-sm border-0" style="border-radius: 16px">
@@ -345,21 +323,68 @@
               <h5 class="card-title fw-bold mb-4 text-center">
                 Despesas por Categoria
               </h5>
-              <div
-                style="
-                  height: 320px;
-                  width: 100%;
-                  display: flex;
-                  justify-content: center;
-                  position: relative;
-                "
-              >
+              <div style="height: 320px; width: 100%; display: flex; justify-content: center; position: relative;">
                 <canvas id="graficoDespesas"></canvas>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {% if lista_investimentos %}
+      <div class="row mb-5">
+        <div class="col-12">
+          <div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border-radius: 16px;">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h4 class="fw-bold mb-1">
+                    <i class="bi bi-graph-up-arrow text-warning me-2"></i>
+                    Meus Investimentos
+                  </h4>
+                  <small class="text-white-50">Cotações atualizadas em tempo real (Yahoo Finance)</small>
+                </div>
+                <div class="text-end">
+                  <span class="d-block small text-white-50 text-uppercase fw-bold">Patrimônio Investido</span>
+                  <span class="display-6 fw-bold text-warning">R$ {{ total_investido|floatformat:2 }}</span>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-borderless text-white mb-0" style="--bs-table-bg: transparent; --bs-table-color: white">
+                  <thead style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.85rem; text-transform: uppercase;">
+                    <tr>
+                      <th class="text-white-50">Ativo / Ticker</th>
+                      <th class="text-white-50">Quantidade</th>
+                      <th class="text-white-50">Preço Atual</th>
+                      <th class="text-end text-white-50">Saldo Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for inv in lista_investimentos %}
+                    <tr>
+                      <td class="align-middle">
+                        <span class="fw-bold fs-5">{{ inv.simbolo }}</span>
+                      </td>
+                      <td class="align-middle text-white-50">
+                        {{ inv.qtd }}
+                      </td>
+                      <td class="align-middle">
+                        R$ {{ inv.preco|floatformat:2 }}
+                      </td>
+                      <td class="text-end align-middle">
+                        <span class="fw-bold fs-5 text-warning">R$ {{ inv.total|floatformat:2 }}</span>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <div class="actions-bar">
         <h4 class="section-title">Últimas Movimentações</h4>
@@ -390,144 +415,75 @@
                     <small class="text-muted">{{ t.data|date:"Y" }}</small>
                   </td>
                   <td>
-                    {{ t.descricao }} {% if t.observacoes %}
-                    <i
-                      class="bi bi-info-circle text-muted ms-1"
-                      title="{{ t.observacoes }}"
-                    ></i>
+                    {{ t.descricao }}
+                    {% if t.observacoes %}
+                    <i class="bi bi-info-circle text-muted ms-1" title="{{ t.observacoes }}"></i>
                     {% endif %}
                   </td>
                   <td>
                     <span class="badge-category">{{ t.categoria }}</span>
                   </td>
-                  <td
-                    class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}"
-                  >
+                  <td class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
                     {% if t.moeda == 'USD' %}US${% else %}R${% endif %} {{ t.valor|floatformat:2 }}
                   </td>
                   <td class="text-end">
-                    <button
-                      class="btn btn-sm btn-light rounded-circle"
-                      type="button"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasRight-{{ t.id }}"
-                      aria-controls="offcanvasRight"
-                    >
+                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight-{{ t.id }}" aria-controls="offcanvasRight">
                       <i class="bi bi-three-dots-vertical"></i>
                     </button>
 
-                    <div
-                      class="offcanvas offcanvas-end text-bg-dark"
-                      tabindex="-1"
-                      id="offcanvasRight-{{ t.id }}"
-                      aria-labelledby="offcanvasRightLabel"
-                      style="border-left: 1px solid #333; text-align: left"
-                    >
-                      <div
-                        class="offcanvas-header border-bottom border-secondary"
-                      >
-                        <h5
-                          class="offcanvas-title fw-bold"
-                          id="offcanvasRightLabel"
-                        >
-                          <i class="bi bi-wallet2 text-warning me-2"></i>
-                          Detalhes
+                    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasRight-{{ t.id }}" aria-labelledby="offcanvasRightLabel" style="border-left: 1px solid #333; text-align: left">
+                      <div class="offcanvas-header border-bottom border-secondary">
+                        <h5 class="offcanvas-title fw-bold" id="offcanvasRightLabel">
+                          <i class="bi bi-wallet2 text-warning me-2"></i> Detalhes
                         </h5>
-                        <button
-                          type="button"
-                          class="btn-close btn-close-white"
-                          data-bs-dismiss="offcanvas"
-                          aria-label="Close"
-                        ></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                       </div>
 
                       <div class="offcanvas-body">
                         <div class="text-center mb-4 mt-3">
-                          <small class="text-secondary text-uppercase fw-bold"
-                            >Valor da Transação</small
-                          >
-                          <h1
-                            class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}"
-                          >
+                          <small class="text-secondary text-uppercase fw-bold">Valor da Transação</small>
+                          <h1 class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
                             {% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor|floatformat:2 }}
                           </h1>
-                          <span class="badge bg-secondary mt-2"
-                            >{{ t.categoria.nome }}</span
-                          >
+                          <span class="badge bg-secondary mt-2">{{ t.categoria.nome }}</span>
                         </div>
 
                         <hr class="border-secondary" />
 
                         <div class="mb-4">
-                          <label
-                            class="text-secondary small text-uppercase fw-bold"
-                            >Descrição</label
-                          >
+                          <label class="text-secondary small text-uppercase fw-bold">Descrição</label>
                           <p class="fs-5">{{ t.descricao }}</p>
                         </div>
 
                         <div class="mb-4">
-                          <label
-                            class="text-secondary small text-uppercase fw-bold"
-                            >Data</label
-                          >
-                          <p class="fs-5">
-                            {{ t.data|date:"d \d\e F \d\e Y" }}
-                          </p>
+                          <label class="text-secondary small text-uppercase fw-bold">Data</label>
+                          <p class="fs-5">{{ t.data|date:"d \d\e F \d\e Y" }}</p>
                         </div>
 
                         {% if t.observacoes %}
-                        <div
-                          class="mb-4 p-3 rounded"
-                          style="background-color: #1a1a1a"
-                        >
-                          <label
-                            class="text-secondary small text-uppercase fw-bold mb-1"
-                            ><i class="bi bi-card-text me-1"></i>
-                            Observações</label
-                          >
-                          <p class="mb-0 text-light fst-italic">
-                            "{{ t.observacoes }}"
-                          </p>
+                        <div class="mb-4 p-3 rounded" style="background-color: #1a1a1a">
+                          <label class="text-secondary small text-uppercase fw-bold mb-1"><i class="bi bi-card-text me-1"></i> Observações</label>
+                          <p class="mb-0 text-light fst-italic">"{{ t.observacoes }}"</p>
                         </div>
-                        {% endif %} {% if t.comprovante %}
+                        {% endif %}
+
+                        {% if t.comprovante %}
                         <div class="mb-5">
-                          <label
-                            class="text-secondary small text-uppercase fw-bold mb-2"
-                            >Comprovante</label
-                          >
-                          <a
-                            href="{{ t.comprovante.url }}"
-                            target="_blank"
-                            class="btn btn-outline-light w-100 py-3 rounded-pill"
-                          >
-                            <i class="bi bi-paperclip me-2"></i> Visualizar
-                            Anexo
+                          <label class="text-secondary small text-uppercase fw-bold mb-2">Comprovante</label>
+                          <a href="{{ t.comprovante.url }}" target="_blank" class="btn btn-outline-light w-100 py-3 rounded-pill">
+                            <i class="bi bi-paperclip me-2"></i> Visualizar Anexo
                           </a>
                         </div>
                         {% endif %}
 
                         <div class="mt-auto">
                           <hr class="border-secondary" />
-                          <p
-                            class="text-secondary small text-uppercase fw-bold mb-3"
-                          >
-                            Gerenciar Transação
-                          </p>
-
+                          <p class="text-secondary small text-uppercase fw-bold mb-3">Gerenciar Transação</p>
                           <div class="d-grid gap-2">
-                            <a
-                              href="{% url 'editar_transacao' t.id %}"
-                              class="btn btn-warning fw-bold py-3 text-dark rounded-pill"
-                            >
+                            <a href="{% url 'editar_transacao' t.id %}" class="btn btn-warning fw-bold py-3 text-dark rounded-pill">
                               <i class="bi bi-pencil me-2"></i> Editar Dados
                             </a>
-
-                            <a
-                              href="{% url 'excluir_transacao' t.id %}"
-                              class="btn btn-outline-danger fw-bold py-3 rounded-pill"
-                              onclick="return confirm('Tem certeza que deseja apagar essa transação?');"
-                            >
+                            <a href="{% url 'excluir_transacao' t.id %}" class="btn btn-outline-danger fw-bold py-3 rounded-pill" onclick="return confirm('Tem certeza que deseja apagar essa transação?');">
                               <i class="bi bi-trash me-2"></i> Excluir
                             </a>
                           </div>
@@ -550,11 +506,11 @@
         </div>
       </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       const ctx = document.getElementById('graficoDespesas').getContext('2d');
-
       const labels = {{ grafico_labels|safe }};
       const data = {{ grafico_data|safe }};
 
@@ -574,7 +530,7 @@
               maintainAspectRatio: false,
               layout: {
                   padding: {
-                      bottom: 20, // Dá espaço extra embaixo para a legenda não cortar
+                      bottom: 20,
                       top: 10
                   }
               },
@@ -582,25 +538,21 @@
                   legend: {
                       position: 'bottom',
                       labels: {
-                          padding: 20, // Espaço entre as bolinhas da legenda
+                          padding: 20,
                           font: { size: 12 },
                           boxWidth: 12,
-                          usePointStyle: true // Deixa a bolinha da legenda redonda (mais moderno)
+                          usePointStyle: true
                       }
                   }
               }
           }
       });
     </script>
+
     {% if messages %}
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
       {% for message in messages %}
-      <div
-        class="toast align-items-center text-bg-{{ message.tags }} border-0"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
+      <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body fw-bold">
             {% if message.tags == 'success' %}
@@ -609,12 +561,7 @@
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             {% endif %} {{ message }}
           </div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
       </div>
       {% endfor %}
@@ -625,7 +572,6 @@
       document.addEventListener("DOMContentLoaded", function () {
         var toastElList = [].slice.call(document.querySelectorAll(".toast"));
         var toastList = toastElList.map(function (toastEl) {
-          // Cria o toast e manda mostrar (show)
           return new bootstrap.Toast(toastEl).show();
         });
       });
