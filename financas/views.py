@@ -1,7 +1,7 @@
 import requests
 import json
 import yfinance as yf
-from django import forms
+from decimal import Decimal # <--- Importante para somar dinheiro
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
@@ -12,14 +12,49 @@ from .forms import TransacaoForm, InvestimentoForm
 
 @login_required
 def index(request):
+    # --- 0. AUTOMAÇÃO PLUXEE (O ROBÔ DO VR) ---
+    # Verifica se existe um investimento chamado PLUXEE
+    pluxee = Investimento.objects.filter(simbolo__iexact='PLUXEE', usuario=request.user).first()
+    
+    if pluxee:
+        hoje = datetime.now().date()
+        ultimo = pluxee.ultimo_deposito
+        
+        # Se nunca rodou (campo vazio), marca data de ontem para começar a valer hoje
+        if not ultimo:
+            pluxee.ultimo_deposito = hoje
+            pluxee.save()
+            ultimo = hoje
+
+        # LÓGICA: Se hoje é um mês diferente do último depósito
+        # E hoje é dia 30 ou 31 (Dia do pagamento)
+        if hoje > ultimo and hoje.day >= 30 and hoje.month != ultimo.month:
+            
+            valor_a_cair = 0
+            
+            # REGRA 1: Dezembro de 2025 (Cai 300)
+            if hoje.year == 2025 and hoje.month == 12:
+                valor_a_cair = 300.00
+            
+            # REGRA 2: Janeiro de 2026 em diante (Cai 380)
+            elif hoje.year >= 2026:
+                valor_a_cair = 380.00
+            
+            # Se tiver valor para cair, atualiza!
+            if valor_a_cair > 0:
+                pluxee.quantidade += Decimal(valor_a_cair) # Soma ao saldo existente
+                pluxee.ultimo_deposito = hoje # Marca que já pagou este mês
+                pluxee.save()
+                messages.success(request, f'💰 Pluxee: Pingou R$ {valor_a_cair} na conta!')
+
     # --- 1. Filtros de Data ---
-    hoje = datetime.now()
+    hoje_dt = datetime.now()
     try:
-        mes_atual = int(request.GET.get('mes', hoje.month))
-        ano_atual = int(request.GET.get('ano', hoje.year))
+        mes_atual = int(request.GET.get('mes', hoje_dt.month))
+        ano_atual = int(request.GET.get('ano', hoje_dt.year))
     except ValueError:
-        mes_atual = hoje.month
-        ano_atual = hoje.year
+        mes_atual = hoje_dt.month
+        ano_atual = hoje_dt.year
 
     transacoes_do_mes = Transacao.objects.filter(
         data__month=mes_atual, 
@@ -38,27 +73,24 @@ def index(request):
         pass 
 
     # --- 3. Totais (Receita vs Despesa) ---
-    # Receitas
     receitas_brl = float(transacoes_do_mes.filter(categoria__tipo='R', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
     receitas_usd = float(transacoes_do_mes.filter(categoria__tipo='R', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
     total_receitas = receitas_brl + (receitas_usd * cotacao_dolar)
 
-    # Despesas
     despesas_brl = float(transacoes_do_mes.filter(categoria__tipo='D', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
     despesas_usd = float(transacoes_do_mes.filter(categoria__tipo='D', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
     total_despesas = despesas_brl + (despesas_usd * cotacao_dolar)
 
-    # Saldos
     saldo = total_receitas - total_despesas
     saldo_usd_original = receitas_usd - despesas_usd
 
-    # --- 4. INVESTIMENTOS (Com lógica para Renda Fixa) ---
+    # --- 4. INVESTIMENTOS (Com separação do Pluxee) ---
     investimentos = Investimento.objects.filter(usuario=request.user)
     total_investido = 0
     lista_investimentos = []
+    saldo_pluxee = 0 # Variável para o card vermelho
 
     if investimentos.exists():
-        # Junta todos os símbolos numa string só para buscar rápido no Yahoo
         tickers_str = " ".join([i.simbolo for i in investimentos])
         
         try:
@@ -67,31 +99,27 @@ def index(request):
             for inv in investimentos:
                 cotacao_atual = 0.0
                 
-                # Tenta buscar cotação no Yahoo Finance
                 try:
-                    # Se tiver um único ativo, a estrutura do yfinance muda um pouco,
-                    # então acessamos direto pelo símbolo se possível
                     if len(investimentos) == 1:
                         ticker = tickers_data.tickers[inv.simbolo]
                     else:
                         ticker = tickers_data.tickers[inv.simbolo]
                         
                     hist = ticker.history(period="1d")
-                    
                     if not hist.empty:
                         cotacao_atual = hist['Close'].iloc[-1]
                     else:
-                        # TRUQUE DO COFRINHO: Se não tem histórico (ex: MERCADO_PAGO),
-                        # assume preço = 1.0 (Renda Fixa / Dinheiro)
-                        cotacao_atual = 1.0
+                        cotacao_atual = 1.0 # Renda Fixa / Manual
                 except Exception:
-                    # Se der qualquer erro na busca desse ativo específico,
-                    # assume 1.0 para não quebrar a tela
-                    cotacao_atual = 1.0
+                    cotacao_atual = 1.0 # Erro na API = Renda Fixa
                 
                 valor_atual = float(inv.quantidade) * cotacao_atual
                 total_investido += valor_atual
-                
+
+                # Se for PLUXEE, guarda o valor separado pro Card Vermelho
+                if inv.simbolo.upper() == 'PLUXEE':
+                    saldo_pluxee = valor_atual
+
                 lista_investimentos.append({
                     'id_investimento': inv.id,
                     'simbolo': inv.simbolo,
@@ -106,8 +134,6 @@ def index(request):
     transacoes = transacoes_do_mes.order_by('-data')
     
     dados_grafico = {} 
-    
-    # LÓGICA DO GRÁFICO (Convertendo Dólar e Filtrando Despesa)
     for t in transacoes_do_mes:
         if t.categoria.tipo == 'D':
             valor_real = float(t.valor)
@@ -119,24 +145,23 @@ def index(request):
 
     lista_categorias = []
     lista_valores = []
-    
     for nome, valor in dados_grafico.items():
         lista_categorias.append(f"{nome} - R$ {valor:.2f}")
         lista_valores.append(valor)
 
-    # Listas auxiliares para o filtro
     meses = [
         (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'Março'), (4, 'Abril'),
         (5, 'Maio'), (6, 'Junho'), (7, 'Julho'), (8, 'Agosto'),
         (9, 'Setembro'), (10, 'Outubro'), (11, 'Novembro'), (12, 'Dezembro')
     ]
-    anos = range(hoje.year - 1, hoje.year + 2)
+    anos = range(hoje_dt.year - 1, hoje_dt.year + 2)
 
     context = {
         'receitas': total_receitas,
         'despesas': total_despesas,
         'saldo': saldo,
         'saldo_usd': saldo_usd_original,
+        'saldo_pluxee': saldo_pluxee, # <--- Card Vermelho usa isso
         'total_investido': total_investido,
         'lista_investimentos': lista_investimentos,
         'transacoes': transacoes,
@@ -180,11 +205,6 @@ def excluir_transacao(request, pk):
     transacao.delete()
     messages.success(request, 'Transação removida!')
     return redirect('index')
-
-class InvestimentoForm(forms.ModelForm):
-    class Meta:
-        model = Investimento
-        fields = ['simbolo', 'quantidade']
 
 @login_required
 def editar_investimento(request, pk):
