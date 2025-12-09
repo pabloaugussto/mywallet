@@ -4,7 +4,11 @@ Aplicação web desenvolvida em Python/Django para gestão financeira pessoal. O
 Projetado para rodar localmente com rotinas de backup automático na nuvem.
 
 📸 Screenshots
-<img width="1918" height="890" alt="image" src="https://github.com/user-attachments/assets/3f9ca042-6869-427d-b7de-90a2ea53c779" />
+<img width="1906" height="964" alt="image" src="https://github.com/user-attachments/assets/5d442297-7ab3-44e1-aa16-235f22574be6" />
+
+<img width="1877" height="723" alt="image" src="https://github.com/user-attachments/assets/9c3b663a-d748-471f-9f46-2876829779bd" />
+
+
 
 ✨ Funcionalidades
 📊 Dashboard Interativo: Visão geral de Entradas, Saídas e Saldo Global.
