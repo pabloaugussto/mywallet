@@ -58,3 +58,11 @@ class Investimento(models.Model):
 
     def __str__(self):
         return f"{self.simbolo} ({self.quantidade})"
+    
+class MetaCategoria(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    valor_limite = models.DecimalField(max_digits=9, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.categoria.nome} - Limite: R$ {self.valor_limite}"

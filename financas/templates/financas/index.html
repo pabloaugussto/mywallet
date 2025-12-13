@@ -195,6 +195,43 @@
         </div>
       </div>
 
+      {% if lista_metas %}
+      <div class="row mb-5">
+        <div class="col-md-8 offset-md-2">
+          <div class="card shadow-sm border-0" style="border-radius: 16px;">
+            <div class="card-body p-4">
+              <h5 class="fw-bold mb-4"><i class="bi bi-bullseye text-danger me-2"></i> Metas de Gastos</h5>
+              
+              {% for meta in lista_metas %}
+              <div class="mb-4">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="fw-bold text-dark">{{ meta.nome }}</span>
+                  <small class="text-muted">
+                    R$ {{ meta.gasto|floatformat:2 }} / <span class="fw-bold">R$ {{ meta.limite|floatformat:2 }}</span>
+                  </small>
+                </div>
+                
+                <div class="progress" style="height: 10px; background-color: #eee; border-radius: 10px;">
+                  <div class="progress-bar bg-{{ meta.cor }} progress-bar-striped progress-bar-animated" 
+                       role="progressbar" 
+                       style="width: {{ meta.porcentagem }}%; border-radius: 10px;">
+                  </div>
+                </div>
+                
+                {% if meta.porcentagem_real >= 100 %}
+                <small class="text-danger fw-bold d-block mt-1" style="font-size: 0.75rem;">
+                  <i class="bi bi-exclamation-triangle-fill"></i> Limite estourado! ({{ meta.porcentagem_real|floatformat:0 }}%)
+                </small>
+                {% endif %}
+              </div>
+              {% endfor %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       {% if lista_investimentos %}
       <div class="row mb-5">
         <div class="col-12">

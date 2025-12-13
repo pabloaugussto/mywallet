@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Transacao, Investimento
+from .models import Transacao, Investimento, MetaCategoria
 from .forms import TransacaoForm, InvestimentoForm
 
 @login_required
@@ -191,6 +191,40 @@ def index(request):
     pct_receita = calc_pct(total_receitas, total_receitas_ant)
     pct_despesa = calc_pct(total_despesas, total_despesas_ant)
 
+    # ... (código anterior da pct_despesa) ...
+
+    # --- 7. METAS DE GASTOS (NOVO) ---
+    metas = MetaCategoria.objects.filter(usuario=request.user)
+    lista_metas = []
+
+    for meta in metas:
+        # Quanto gastei nesta categoria este mês?
+        gasto_atual = transacoes_do_mes.filter(categoria=meta.categoria, categoria__tipo='D').aggregate(Sum('valor'))['valor__sum'] or 0
+        gasto_atual = float(gasto_atual) # Garante que é número
+        
+        # Calcula porcentagem (cuidado com divisão por zero)
+        if meta.valor_limite > 0:
+            porcentagem = (gasto_atual / float(meta.valor_limite)) * 100
+        else:
+            porcentagem = 100
+
+        # Define a cor da barra
+        if porcentagem >= 100:
+            cor = 'danger' # Vermelho (Estourou)
+        elif porcentagem >= 80:
+            cor = 'warning' # Amarelo (Alerta)
+        else:
+            cor = 'success' # Verde (Tranquilo)
+
+        lista_metas.append({
+            'nome': meta.categoria.nome,
+            'limite': float(meta.valor_limite),
+            'gasto': gasto_atual,
+            'porcentagem': min(porcentagem, 100), # Trava a barra visualmente em 100%
+            'porcentagem_real': porcentagem,
+            'cor': cor
+        })
+
     context = {
         'receitas': total_receitas,
         'despesas': total_despesas,
@@ -209,6 +243,7 @@ def index(request):
         'lista_anos': anos,
         'pct_receita': pct_receita,  # <--- NOVO
         'pct_despesa': pct_despesa,  # <--- NOVO
+        'lista_metas': lista_metas,
     }
 
     return render(request, 'financas/index.html', context)
