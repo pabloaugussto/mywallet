@@ -1,3 +1,5 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 import requests
 import json
 import yfinance as yf
@@ -7,7 +9,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Transacao, Investimento, MetaCategoria
+from django.contrib.auth.models import User
+from .models import Transacao, Investimento, MetaCategoria, Categoria
 from .forms import TransacaoForm, InvestimentoForm
 
 @login_required
@@ -289,3 +292,45 @@ def editar_investimento(request, pk):
         return redirect('index')
     
     return render(request, 'financas/form.html', {'form': form})
+
+@csrf_exempt # Permite que o Twilio mande dados sem estar logado no site
+def bot_whatsapp(request):
+    if request.method == 'POST':
+        # 1. Pega a mensagem que chegou do WhatsApp
+        mensagem = request.POST.get('Body')  # Ex: "Uber 15.90"
+        
+        # 2. Tenta entender o texto
+        try:
+            # Separa o texto por espaços
+            partes = mensagem.split() 
+            
+            # A última parte é o valor (Ex: 15.90)
+            valor_str = partes[-1].replace(',', '.')
+            valor = float(valor_str)
+            
+            # O resto é a descrição (Ex: Uber)
+            descricao = " ".join(partes[:-1])
+            
+            # 3. Define configurações padrão (MVP)
+            # Pega o usuário principal (admin)
+            usuario = User.objects.first() 
+            # Pega a primeira categoria de Despesa que achar
+            categoria = Categoria.objects.filter(tipo='D').first()
+            
+            # 4. Salva no Banco de Dados
+            Transacao.objects.create(
+                descricao=descricao,
+                valor=valor,
+                data=datetime.now().date(),
+                categoria=categoria,
+                usuario=usuario,
+                moeda='BRL'
+            )
+            
+            return HttpResponse("✅ Gasto salvo!")
+            
+        except Exception as e:
+            # Se a pessoa mandou texto errado
+            return HttpResponse(f"❌ Erro! Mande assim: 'Uber 20.00'")
+
+    return HttpResponse("Bot rodando!")
