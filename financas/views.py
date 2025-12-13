@@ -156,6 +156,41 @@ def index(request):
     ]
     anos = range(hoje_dt.year - 1, hoje_dt.year + 2)
 
+    # --- 6. LÓGICA DE COMPARAÇÃO (MÊS ATUAL vs ANTERIOR) ---
+    # 1. Descobre a data do mês passado
+    if mes_atual == 1:
+        mes_anterior = 12
+        ano_anterior = ano_atual - 1
+    else:
+        mes_anterior = mes_atual - 1
+        ano_anterior = ano_atual
+
+    # 2. Busca totais do mês passado
+    transacoes_ant = Transacao.objects.filter(
+        data__month=mes_anterior, 
+        data__year=ano_anterior,
+        usuario=request.user
+    )
+    
+    # Receita Anterior
+    rec_brl_ant = float(transacoes_ant.filter(categoria__tipo='R', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
+    rec_usd_ant = float(transacoes_ant.filter(categoria__tipo='R', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
+    total_receitas_ant = rec_brl_ant + (rec_usd_ant * cotacao_dolar)
+
+    # Despesa Anterior
+    desp_brl_ant = float(transacoes_ant.filter(categoria__tipo='D', moeda='BRL').aggregate(Sum('valor'))['valor__sum'] or 0)
+    desp_usd_ant = float(transacoes_ant.filter(categoria__tipo='D', moeda='USD').aggregate(Sum('valor'))['valor__sum'] or 0)
+    total_despesas_ant = desp_brl_ant + (desp_usd_ant * cotacao_dolar)
+
+    # 3. Calcula Porcentagem
+    def calc_pct(atual, anterior):
+        if anterior == 0:
+            return 100.0 if atual > 0 else 0.0
+        return ((atual - anterior) / anterior) * 100
+
+    pct_receita = calc_pct(total_receitas, total_receitas_ant)
+    pct_despesa = calc_pct(total_despesas, total_despesas_ant)
+
     context = {
         'receitas': total_receitas,
         'despesas': total_despesas,
@@ -172,6 +207,8 @@ def index(request):
         'ano_atual': ano_atual,
         'lista_meses': meses,
         'lista_anos': anos,
+        'pct_receita': pct_receita,  # <--- NOVO
+        'pct_despesa': pct_despesa,  # <--- NOVO
     }
 
     return render(request, 'financas/index.html', context)
