@@ -20,6 +20,8 @@ urlpatterns = [
     path('excluir/<int:pk>/', views.excluir_transacao, name='excluir_transacao'),
     path('investimento/editar/<int:pk>/', views.editar_investimento, name='editar_investimento'),
     path('webhook/', views.bot_whatsapp, name='bot_whatsapp'),
+    path('clonar_despesas/', views.clonar_despesas_mes_anterior, name='clonar_despesas'),
+    path('remover/<int:id>/', views.remover_transacao, name='remover_transacao'),
 ]
 
 

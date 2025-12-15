@@ -293,6 +293,59 @@ def editar_investimento(request, pk):
     
     return render(request, 'financas/form.html', {'form': form})
 
+@login_required
+def clonar_despesas_mes_anterior(request):
+    # 1. Descobrir qual é o mês/ano passado
+    hoje = datetime.now().date()
+    if hoje.month == 1:
+        mes_anterior = 12
+        ano_anterior = hoje.year - 1
+    else:
+        mes_anterior = hoje.month - 1
+        ano_anterior = hoje.year
+
+    # 2. Buscar as despesas desse mês passado
+    despesas_antigas = Transacao.objects.filter(
+        usuario=request.user,
+        categoria__tipo='D', # Só queremos despesas, não receitas
+        data__month=mes_anterior,
+        data__year=ano_anterior
+    )
+
+    if not despesas_antigas.exists():
+        messages.error(request, "Não encontrei despesas no mês passado para copiar.")
+        return redirect('index')
+
+    # 3. Criar as cópias
+    contador = 0
+    for despesa in despesas_antigas:
+        # Tenta manter o mesmo dia (ex: dia 15). Se der erro (ex: dia 31 em fev), usa dia 28.
+        try:
+            nova_data = despesa.data.replace(month=hoje.month, year=hoje.year)
+        except ValueError:
+            nova_data = despesa.data.replace(day=28, month=hoje.month, year=hoje.year)
+
+        Transacao.objects.create(
+            descricao=despesa.descricao, # Mantém o mesmo nome
+            valor=despesa.valor,
+            categoria=despesa.categoria,
+            data=nova_data, # Data atualizada para este mês
+            usuario=request.user,
+            moeda=despesa.moeda,
+            observacoes="Cópia automática do mês anterior" # Para você saber o que foi robô
+        )
+        contador += 1
+
+    messages.success(request, f"{contador} despesas do mês passado foram clonadas para hoje!")
+    return redirect('index')
+
+@login_required
+def remover_transacao(request, id):
+    transacao = get_object_or_404(Transacao, pk=id, usuario=request.user)
+    transacao.delete()
+    messages.success(request, "Transação removida com sucesso!")
+    return redirect('index')
+
 @csrf_exempt # Permite que o Twilio mande dados sem estar logado no site
 def bot_whatsapp(request):
     if request.method == 'POST':

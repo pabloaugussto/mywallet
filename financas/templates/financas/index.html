@@ -9,30 +9,160 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
 
     <style>
-      .ticker-bar { background-color: var(--nomad-yellow); color: var(--nomad-black); font-size: 0.85rem; padding: 5px 0; font-weight: 700; text-align: center; letter-spacing: 0.5px; }
-      :root { --nomad-yellow: #fece00; --nomad-black: #111111; --nomad-gray: #f5f5f5; --text-gray: #666; }
-      body { font-family: "Montserrat", sans-serif; background-color: var(--nomad-gray); padding-bottom: 40px; }
-      .navbar-custom { background-color: var(--nomad-black); padding: 15px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-      .navbar-brand { font-weight: 700; color: white !important; letter-spacing: 1px; font-size: 1.4rem; }
-      .user-profile { color: white; font-size: 0.9rem; opacity: 0.8; }
-      .btn-logout { color: var(--nomad-yellow); border: 1px solid var(--nomad-yellow); border-radius: 20px; padding: 5px 15px; font-size: 0.8rem; text-decoration: none; margin-left: 10px; transition: all 0.3s; }
-      .btn-logout:hover { background-color: var(--nomad-yellow); color: var(--nomad-black); }
-      .card-summary { border: none; border-radius: 16px; background-color: white; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); transition: transform 0.2s; overflow: hidden; height: 100%; }
-      .card-summary:hover { transform: translateY(-5px); }
-      .card-summary .card-body { padding: 25px; position: relative; }
-      .summary-label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: var(--text-gray); margin-bottom: 10px; display: block; }
-      .summary-value { font-size: 1.8rem; font-weight: 700; color: var(--nomad-black); }
-      .card-icon-bg { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.05; color: var(--nomad-black); }
-      .text-income { color: #198754; }
-      .text-expense { color: #dc3545; }
-      .actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-      .section-title { font-size: 1.2rem; font-weight: 700; color: var(--nomad-black); }
-      .btn-new-transaction { background-color: var(--nomad-black); color: white; font-weight: 600; padding: 10px 25px; border-radius: 30px; border: none; display: flex; align-items: center; gap: 8px; transition: all 0.3s; text-decoration: none; }
-      .btn-new-transaction:hover { background-color: var(--nomad-yellow); color: var(--nomad-black); }
-      .table-card { background: white; border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow: hidden; }
-      .table thead th { background-color: white; border-bottom: 2px solid #f0f0f0; color: #888; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 15px 20px; }
-      .table tbody td { padding: 15px 20px; vertical-align: middle; border-bottom: 1px solid #f8f8f8; font-size: 0.95rem; font-weight: 500; color: #333; }
-      .badge-category { background-color: #f0f0f0; color: #555; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
+      :root {
+        --nomad-yellow: #fece00;
+        --nomad-black: #111111;
+        --nomad-gray: #f5f5f5;
+        --text-gray: #666;
+      }
+      body {
+        font-family: "Montserrat", sans-serif;
+        background-color: var(--nomad-gray);
+        padding-bottom: 40px;
+      }
+      .ticker-bar {
+        background-color: var(--nomad-yellow);
+        color: var(--nomad-black);
+        font-size: 0.85rem;
+        padding: 5px 0;
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.5px;
+      }
+      .navbar-custom {
+        background-color: var(--nomad-black);
+        padding: 15px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        color: white !important;
+        letter-spacing: 1px;
+        font-size: 1.4rem;
+      }
+      .user-profile {
+        color: white;
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+      .btn-logout {
+        color: var(--nomad-yellow);
+        border: 1px solid var(--nomad-yellow);
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.8rem;
+        text-decoration: none;
+        margin-left: 10px;
+        transition: all 0.3s;
+      }
+      .btn-logout:hover {
+        background-color: var(--nomad-yellow);
+        color: var(--nomad-black);
+      }
+      .card-summary {
+        border: none;
+        border-radius: 16px;
+        background-color: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+        overflow: hidden;
+        height: 100%;
+      }
+      .card-summary:hover {
+        transform: translateY(-5px);
+      }
+      .card-summary .card-body {
+        padding: 25px;
+        position: relative;
+      }
+      .summary-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--text-gray);
+        margin-bottom: 10px;
+        display: block;
+      }
+      .summary-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--nomad-black);
+      }
+      .card-icon-bg {
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+        font-size: 5rem;
+        opacity: 0.05;
+        color: var(--nomad-black);
+      }
+      .text-income {
+        color: #198754;
+      }
+      .text-expense {
+        color: #dc3545;
+      }
+      .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--nomad-black);
+      }
+      .btn-new-transaction {
+        background-color: var(--nomad-black);
+        color: white;
+        font-weight: 600;
+        padding: 10px 25px;
+        border-radius: 30px;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        text-decoration: none;
+      }
+      .btn-new-transaction:hover {
+        background-color: var(--nomad-yellow);
+        color: var(--nomad-black);
+      }
+      .table-card {
+        background: white;
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+      /* Ajuste da Tabela */
+      .table thead th {
+        background-color: white;
+        border-bottom: 2px solid #f0f0f0;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding: 15px 20px;
+      }
+      .table tbody td {
+        padding: 15px 20px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f8f8f8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #333;
+      }
+      .badge-category {
+        background-color: #f0f0f0;
+        color: #555;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
     </style>
   </head>
   <body>
@@ -45,9 +175,7 @@
 
     <nav class="navbar navbar-custom mb-5">
       <div class="container">
-        <a class="navbar-brand" href="#">
-          <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet
-        </a>
+        <a class="navbar-brand" href="#"> <i class="bi bi-wallet2 text-warning me-2"></i> MyWallet </a>
         <div class="d-flex align-items-center">
           <span class="user-profile me-3">Olá, <strong>{{ request.user.username }}</strong></span>
           <form action="{% url 'logout' %}" method="post" class="d-inline">
@@ -87,27 +215,18 @@
 
     <div class="container">
       <div class="row mb-4">
-        
         <div class="col-md-4 mb-3">
           <div class="card-summary">
             <div class="card-body">
               <span class="summary-label">Entradas Totais</span>
-              <div class="summary-value text-income mb-1">
-                R$ {{ receitas|floatformat:2 }}
-              </div>
-              
+              <div class="summary-value text-income mb-1">R$ {{ receitas|floatformat:2 }}</div>
               {% if pct_receita > 0 %}
-                <small class="text-success fw-bold" style="font-size: 0.75rem;">
-                  <i class="bi bi-arrow-up"></i> {{ pct_receita|floatformat:1 }}% vs mês anterior
-                </small>
+              <small class="text-success fw-bold" style="font-size: 0.75rem;"> <i class="bi bi-arrow-up"></i> {{ pct_receita|floatformat:1 }}% vs mês anterior </small>
               {% elif pct_receita < 0 %}
-                <small class="text-danger fw-bold" style="font-size: 0.75rem;">
-                  <i class="bi bi-arrow-down"></i> {{ pct_receita|floatformat:1 }}% vs mês anterior
-                </small>
+              <small class="text-danger fw-bold" style="font-size: 0.75rem;"> <i class="bi bi-arrow-down"></i> {{ pct_receita|floatformat:1 }}% vs mês anterior </small>
               {% else %}
-                <small class="text-muted" style="font-size: 0.75rem;">= Igual ao mês anterior</small>
+              <small class="text-muted" style="font-size: 0.75rem;">= Igual ao mês anterior</small>
               {% endif %}
-
               <i class="bi bi-arrow-up-circle card-icon-bg"></i>
             </div>
           </div>
@@ -117,22 +236,14 @@
           <div class="card-summary">
             <div class="card-body">
               <span class="summary-label">Saídas Totais</span>
-              <div class="summary-value text-expense mb-1">
-                R$ {{ despesas|floatformat:2 }}
-              </div>
-
+              <div class="summary-value text-expense mb-1">R$ {{ despesas|floatformat:2 }}</div>
               {% if pct_despesa > 0 %}
-                <small class="text-danger fw-bold" style="font-size: 0.75rem;">
-                  <i class="bi bi-arrow-up"></i> {{ pct_despesa|floatformat:1 }}% vs mês anterior
-                </small>
+              <small class="text-danger fw-bold" style="font-size: 0.75rem;"> <i class="bi bi-arrow-up"></i> {{ pct_despesa|floatformat:1 }}% vs mês anterior </small>
               {% elif pct_despesa < 0 %}
-                <small class="text-success fw-bold" style="font-size: 0.75rem;">
-                  <i class="bi bi-arrow-down"></i> {{ pct_despesa|floatformat:1 }}% vs mês anterior
-                </small>
+              <small class="text-success fw-bold" style="font-size: 0.75rem;"> <i class="bi bi-arrow-down"></i> {{ pct_despesa|floatformat:1 }}% vs mês anterior </small>
               {% else %}
-                <small class="text-muted" style="font-size: 0.75rem;">= Igual ao mês anterior</small>
+              <small class="text-muted" style="font-size: 0.75rem;">= Igual ao mês anterior</small>
               {% endif %}
-
               <i class="bi bi-arrow-down-circle card-icon-bg"></i>
             </div>
           </div>
@@ -142,9 +253,7 @@
           <div class="card-summary" style="background-color: var(--nomad-black); color: white">
             <div class="card-body">
               <span class="summary-label" style="color: #aaa">Saldo Global (R$)</span>
-              <div class="summary-value" style="color: var(--nomad-yellow)">
-                R$ {{ saldo|floatformat:2 }}
-              </div>
+              <div class="summary-value" style="color: var(--nomad-yellow)">R$ {{ saldo|floatformat:2 }}</div>
               <i class="bi bi-wallet2 card-icon-bg" style="color: white; opacity: 0.1"></i>
             </div>
           </div>
@@ -156,27 +265,22 @@
           <div class="card-summary" style="background-color: #0d6efd; color: white">
             <div class="card-body">
               <span class="summary-label" style="color: #e0e0e0">Saldo em Dólar</span>
-              <div class="summary-value text-white">
-                US$ {{ saldo_usd|floatformat:2 }}
-              </div>
+              <div class="summary-value text-white">US$ {{ saldo_usd|floatformat:2 }}</div>
               <i class="bi bi-globe-americas card-icon-bg" style="color: white; opacity: 0.2"></i>
             </div>
           </div>
         </div>
-
         <div class="col-md-6 mb-3">
           <div class="card-summary" style="background: linear-gradient(45deg, #ff3366, #ff5e62); color: white">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
                   <span class="summary-label" style="color: #ffd1d1">Saldo Pluxee (VR)</span>
-                  <div class="summary-value text-white">
-                    R$ {{ saldo_pluxee|floatformat:2 }}
-                  </div>
+                  <div class="summary-value text-white">R$ {{ saldo_pluxee|floatformat:2 }}</div>
                 </div>
-                <i class="bi bi-cup-hot-fill fs-1" style="color: white; opacity: 0.3;"></i>
+                <i class="bi bi-cup-hot-fill fs-1" style="color: white; opacity: 0.3"></i>
               </div>
-              <small class="text-white-50" style="font-size: 0.75rem;">Renova no último dia do mês</small>
+              <small class="text-white-50" style="font-size: 0.75rem">Renova no último dia do mês</small>
             </div>
           </div>
         </div>
@@ -187,7 +291,7 @@
           <div class="card shadow-sm border-0" style="border-radius: 16px">
             <div class="card-body" style="height: 400px; position: relative">
               <h5 class="card-title fw-bold mb-4 text-center">Despesas por Categoria</h5>
-              <div style="height: 320px; width: 100%; display: flex; justify-content: center; position: relative;">
+              <div style="height: 320px; width: 100%; display: flex; justify-content: center; position: relative">
                 <canvas id="graficoDespesas"></canvas>
               </div>
             </div>
@@ -198,34 +302,23 @@
       {% if lista_metas %}
       <div class="row mb-5">
         <div class="col-md-8 offset-md-2">
-          <div class="card shadow-sm border-0" style="border-radius: 16px;">
+          <div class="card shadow-sm border-0" style="border-radius: 16px">
             <div class="card-body p-4">
               <h5 class="fw-bold mb-4"><i class="bi bi-bullseye text-danger me-2"></i> Metas de Gastos</h5>
-              
               {% for meta in lista_metas %}
               <div class="mb-4">
                 <div class="d-flex justify-content-between mb-1">
                   <span class="fw-bold text-dark">{{ meta.nome }}</span>
-                  <small class="text-muted">
-                    R$ {{ meta.gasto|floatformat:2 }} / <span class="fw-bold">R$ {{ meta.limite|floatformat:2 }}</span>
-                  </small>
+                  <small class="text-muted"> R$ {{ meta.gasto|floatformat:2 }} / <span class="fw-bold">R$ {{ meta.limite|floatformat:2 }}</span> </small>
                 </div>
-                
-                <div class="progress" style="height: 10px; background-color: #eee; border-radius: 10px;">
-                  <div class="progress-bar bg-{{ meta.cor }} progress-bar-striped progress-bar-animated" 
-                       role="progressbar" 
-                       style="width: {{ meta.porcentagem }}%; border-radius: 10px;">
-                  </div>
+                <div class="progress" style="height: 10px; background-color: #eee; border-radius: 10px">
+                  <div class="progress-bar bg-{{ meta.cor }} progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ meta.porcentagem }}%; border-radius: 10px"></div>
                 </div>
-                
                 {% if meta.porcentagem_real >= 100 %}
-                <small class="text-danger fw-bold d-block mt-1" style="font-size: 0.75rem;">
-                  <i class="bi bi-exclamation-triangle-fill"></i> Limite estourado! ({{ meta.porcentagem_real|floatformat:0 }}%)
-                </small>
+                <small class="text-danger fw-bold d-block mt-1" style="font-size: 0.75rem"> <i class="bi bi-exclamation-triangle-fill"></i> Limite estourado! ({{ meta.porcentagem_real|floatformat:0 }}%) </small>
                 {% endif %}
               </div>
               {% endfor %}
-
             </div>
           </div>
         </div>
@@ -235,7 +328,7 @@
       {% if lista_investimentos %}
       <div class="row mb-5">
         <div class="col-12">
-          <div class="card shadow-sm" style="background-color: #111111; border: 1px solid #333; border-radius: 16px;">
+          <div class="card shadow-sm" style="background-color: #111111; border: 1px solid #333; border-radius: 16px">
             <div class="card-body p-4">
               <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -248,26 +341,26 @@
                 </div>
               </div>
               <div class="table-responsive">
-                <table class="table mb-0" style="background-color: transparent !important; --bs-table-bg: transparent;">
-                  <thead style="border-bottom: 1px solid #333; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                <table class="table mb-0" style="background-color: transparent !important; --bs-table-bg: transparent">
+                  <thead style="border-bottom: 1px solid #333; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px">
                     <tr>
                       <th class="text-secondary py-3 border-0">Ativo</th>
                       <th class="text-secondary py-3 border-0">Qtd.</th>
                       <th class="text-secondary py-3 border-0">Cotação</th>
                       <th class="text-end text-secondary py-3 border-0">Total</th>
-                      <th class="text-end text-secondary py-3 border-0" style="width: 50px;"></th>
+                      <th class="text-end text-secondary py-3 border-0" style="width: 50px"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for inv in lista_investimentos %}
-                    <tr style="border-bottom: 1px solid #222;">
+                    <tr style="border-bottom: 1px solid #222">
                       <td class="py-3 border-0"><span class="fw-bold fs-5 text-white">{{ inv.simbolo }}</span></td>
                       <td class="py-3 border-0"><span class="text-secondary">{{ inv.qtd|floatformat:2 }}</span></td>
                       <td class="py-3 border-0"><span class="text-secondary">R$ {{ inv.preco|floatformat:2 }}</span></td>
                       <td class="text-end py-3 border-0"><span class="fw-bold fs-5 text-warning">R$ {{ inv.total|floatformat:2 }}</span></td>
                       <td class="text-end py-3 border-0">
                         <a href="{% url 'editar_investimento' inv.id_investimento %}" class="btn btn-sm btn-outline-secondary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-                          <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                          <i class="bi bi-pencil-fill" style="font-size: 0.8rem"></i>
                         </a>
                       </td>
                     </tr>
@@ -281,117 +374,134 @@
       </div>
       {% endif %}
 
-      <div class="actions-bar">
-        <h4 class="section-title">Últimas Movimentações</h4>
-        <a href="{% url 'nova_transacao' %}" class="btn-new-transaction"><i class="bi bi-plus-lg"></i> Nova Transação</a>
+      <div class="actions-bar d-flex justify-content-between align-items-center mb-3">
+        <h4 class="section-title mb-0">Últimas Movimentações</h4>
+        <div class="d-flex gap-2">
+          <a href="{% url 'clonar_despesas' %}" class="btn btn-outline-dark rounded-pill px-3" onclick="return confirm('Isso vai copiar TODAS as despesas do mês passado para este mês. Deseja continuar?');"> <i class="bi bi-arrow-repeat"></i> Repetir Mês Anterior </a>
+          <a href="{% url 'nova_transacao' %}" class="btn-new-transaction"> <i class="bi bi-plus-lg"></i> Nova Transação </a>
+        </div>
       </div>
 
-      <div class="card table-card">
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Valor</th>
-                  <th class="text-end">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for t in transacoes %}
-                <tr>
-                  <td>
-                    <span class="fw-bold">{{ t.data|date:"d M" }}</span><br />
-                    <small class="text-muted">{{ t.data|date:"Y" }}</small>
-                  </td>
-                  <td>
-                    {{ t.descricao }}
+      <div class="table-card mb-5">
+        <table class="table table-hover mb-0 align-middle">
+          <thead>
+            <tr>
+              <th style="width: 15%">Data</th>
+              <th style="width: 30%">Descrição</th>
+              <th style="width: 20%">Categoria</th>
+              <th style="width: 20%">Valor</th>
+              <th style="width: 15%" class="text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in transacoes %}
+            <tr>
+              <td>
+                <span class="fw-bold">{{ t.data|date:"d M" }}</span><br />
+                <small class="text-muted">{{ t.data|date:"Y" }}</small>
+              </td>
+
+              <td>
+                {{ t.descricao }} {% if t.observacoes %}
+                <i class="bi bi-info-circle text-muted ms-1" title="{{ t.observacoes }}"></i>
+                {% endif %}
+              </td>
+
+              <td>
+                <span class="badge-category">{{ t.categoria.nome }}</span>
+              </td>
+
+              <td class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">{% if t.moeda == 'USD' %}US${% else %}R${% endif %} {{ t.valor|floatformat:2 }}</td>
+
+              <td class="text-end">
+                <button class="btn btn-sm btn-light rounded-circle me-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight-{{ t.id }}" aria-controls="offcanvasRight" title="Ver Detalhes">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+
+                <a href="{% url 'remover_transacao' t.id %}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Tem certeza que deseja apagar?');" title="Excluir">
+                  <i class="bi bi-trash"></i>
+                </a>
+
+                <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasRight-{{ t.id }}" aria-labelledby="offcanvasRightLabel" style="border-left: 1px solid #333; text-align: left">
+                  <div class="offcanvas-header border-bottom border-secondary">
+                    <h5 class="offcanvas-title fw-bold" id="offcanvasRightLabel"><i class="bi bi-wallet2 text-warning me-2"></i> Detalhes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                  </div>
+                  <div class="offcanvas-body">
+                    <div class="text-center mb-4 mt-3">
+                      <small class="text-secondary text-uppercase fw-bold">Valor da Transação</small>
+                      <h1 class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">{% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor|floatformat:2 }}</h1>
+                      <span class="badge bg-secondary mt-2">{{ t.categoria.nome }}</span>
+                    </div>
+                    <hr class="border-secondary" />
+                    <div class="mb-4">
+                      <label class="text-secondary small text-uppercase fw-bold">Descrição</label>
+                      <p class="fs-5">{{ t.descricao }}</p>
+                    </div>
+                    <div class="mb-4">
+                      <label class="text-secondary small text-uppercase fw-bold">Data</label>
+                      <p class="fs-5">{{ t.data|date:"d \d\e F \d\e Y" }}</p>
+                    </div>
+
                     {% if t.observacoes %}
-                    <i class="bi bi-info-circle text-muted ms-1" title="{{ t.observacoes }}"></i>
+                    <div class="mb-4 p-3 rounded" style="background-color: #1a1a1a">
+                      <label class="text-secondary small text-uppercase fw-bold mb-1"><i class="bi bi-card-text me-1"></i> Observações</label>
+                      <p class="mb-0 text-light fst-italic">"{{ t.observacoes }}"</p>
+                    </div>
+                    {% endif %} {% if t.comprovante %}
+                    <div class="mb-5">
+                      <label class="text-secondary small text-uppercase fw-bold mb-2">Comprovante</label>
+                      <a href="{{ t.comprovante.url }}" target="_blank" class="btn btn-outline-light w-100 py-3 rounded-pill"><i class="bi bi-paperclip me-2"></i> Visualizar Anexo</a>
+                    </div>
                     {% endif %}
-                  </td>
-                  <td><span class="badge-category">{{ t.categoria }}</span></td>
-                  <td class="fw-bold text-nowrap {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
-                    {% if t.moeda == 'USD' %}US${% else %}R${% endif %} {{ t.valor|floatformat:2 }}
-                  </td>
-                  <td class="text-end">
-                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight-{{ t.id }}" aria-controls="offcanvasRight">
-                      <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasRight-{{ t.id }}" aria-labelledby="offcanvasRightLabel" style="border-left: 1px solid #333; text-align: left">
-                      <div class="offcanvas-header border-bottom border-secondary">
-                        <h5 class="offcanvas-title fw-bold" id="offcanvasRightLabel"><i class="bi bi-wallet2 text-warning me-2"></i> Detalhes</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                      </div>
-                      <div class="offcanvas-body">
-                        <div class="text-center mb-4 mt-3">
-                          <small class="text-secondary text-uppercase fw-bold">Valor da Transação</small>
-                          <h1 class="display-5 fw-bold {% if t.categoria.tipo == 'D' %}text-danger{% else %}text-success{% endif %}">
-                            {% if t.moeda == 'USD' %} US$ {% else %} R$ {% endif %} {{ t.valor|floatformat:2 }}
-                          </h1>
-                          <span class="badge bg-secondary mt-2">{{ t.categoria.nome }}</span>
-                        </div>
-                        <hr class="border-secondary" />
-                        <div class="mb-4"><label class="text-secondary small text-uppercase fw-bold">Descrição</label><p class="fs-5">{{ t.descricao }}</p></div>
-                        <div class="mb-4"><label class="text-secondary small text-uppercase fw-bold">Data</label><p class="fs-5">{{ t.data|date:"d \d\e F \d\e Y" }}</p></div>
-                        {% if t.observacoes %}
-                        <div class="mb-4 p-3 rounded" style="background-color: #1a1a1a">
-                          <label class="text-secondary small text-uppercase fw-bold mb-1"><i class="bi bi-card-text me-1"></i> Observações</label>
-                          <p class="mb-0 text-light fst-italic">"{{ t.observacoes }}"</p>
-                        </div>
-                        {% endif %}
-                        {% if t.comprovante %}
-                        <div class="mb-5">
-                          <label class="text-secondary small text-uppercase fw-bold mb-2">Comprovante</label>
-                          <a href="{{ t.comprovante.url }}" target="_blank" class="btn btn-outline-light w-100 py-3 rounded-pill"><i class="bi bi-paperclip me-2"></i> Visualizar Anexo</a>
-                        </div>
-                        {% endif %}
-                        <div class="mt-auto">
-                          <hr class="border-secondary" />
-                          <p class="text-secondary small text-uppercase fw-bold mb-3">Gerenciar Transação</p>
-                          <div class="d-grid gap-2">
-                            <a href="{% url 'editar_transacao' t.id %}" class="btn btn-warning fw-bold py-3 text-dark rounded-pill"><i class="bi bi-pencil me-2"></i> Editar Dados</a>
-                            <a href="{% url 'excluir_transacao' t.id %}" class="btn btn-outline-danger fw-bold py-3 rounded-pill" onclick="return confirm('Tem certeza que deseja apagar essa transação?');"><i class="bi bi-trash me-2"></i> Excluir</a>
-                          </div>
-                        </div>
+
+                    <div class="mt-auto">
+                      <hr class="border-secondary" />
+                      <p class="text-secondary small text-uppercase fw-bold mb-3">Gerenciar Transação</p>
+                      <div class="d-grid gap-2">
+                        <a href="{% url 'editar_transacao' t.id %}" class="btn btn-warning fw-bold py-3 text-dark rounded-pill"><i class="bi bi-pencil me-2"></i> Editar Dados</a>
+                        <a href="{% url 'remover_transacao' t.id %}" class="btn btn-outline-danger fw-bold py-3 rounded-pill" onclick="return confirm('Tem certeza que deseja apagar essa transação?');"><i class="bi bi-trash me-2"></i> Excluir</a>
                       </div>
                     </div>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-3"></i> Nenhuma transação encontrada.</td></tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </div>
+                </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-1 d-block mb-3"></i> Nenhuma transação encontrada.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      const ctx = document.getElementById('graficoDespesas').getContext('2d');
+      const ctx = document.getElementById("graficoDespesas").getContext("2d");
       const labels = {{ grafico_labels|safe }};
       const data = {{ grafico_data|safe }};
       new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-              labels: labels,
-              datasets: [{
-                  data: data,
-                  backgroundColor: ['#fece00', '#111111', '#e74c3c', '#3498db', '#9b59b6', '#2ecc71'],
-                  borderWidth: 0,
-                  hoverOffset: 10
-              }]
-          },
-          options: {
-              responsive: true, maintainAspectRatio: false,
-              layout: { padding: { bottom: 20, top: 10 } },
-              plugins: { legend: { position: 'bottom', labels: { padding: 20, font: { size: 12 }, boxWidth: 12, usePointStyle: true } } }
-          }
+        type: "doughnut",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              data: data,
+              backgroundColor: ["#fece00", "#111111", "#e74c3c", "#3498db", "#9b59b6", "#2ecc71"],
+              borderWidth: 0,
+              hoverOffset: 10,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: { bottom: 20, top: 10 } },
+          plugins: { legend: { position: "bottom", labels: { padding: 20, font: { size: 12 }, boxWidth: 12, usePointStyle: true } } },
+        },
       });
     </script>
 
@@ -401,9 +511,7 @@
       <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body fw-bold">
-            {% if message.tags == 'success' %} <i class="bi bi-check-circle-fill me-2"></i>
-            {% elif message.tags == 'error' %} <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {% endif %} {{ message }}
+            {% if message.tags == 'success' %} <i class="bi bi-check-circle-fill me-2"></i> {% elif message.tags == 'error' %} <i class="bi bi-exclamation-triangle-fill me-2"></i> {% endif %} {{ message }}
           </div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
@@ -415,7 +523,9 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         var toastElList = [].slice.call(document.querySelectorAll(".toast"));
-        var toastList = toastElList.map(function (toastEl) { return new bootstrap.Toast(toastEl).show(); });
+        var toastList = toastElList.map(function (toastEl) {
+          return new bootstrap.Toast(toastEl).show();
+        });
       });
     </script>
   </body>
