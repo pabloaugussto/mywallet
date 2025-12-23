@@ -1,0 +1,38 @@
+{% extends 'financas/index.html' %}
+{% block content %} <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nova Meta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <h3 class="fw-bold mb-4 text-center">🎯 Definir Nova Meta</h3>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nome da Meta</label>
+                                {{ form.nome }}
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Valor Alvo (R$)</label>
+                                {{ form.valor_alvo }}
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold">Salvar Meta</button>
+                                <a href="{% url 'index' %}" class="btn btn-outline-secondary rounded-pill py-2">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}

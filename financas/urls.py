@@ -22,6 +22,7 @@ urlpatterns = [
     path('webhook/', views.bot_whatsapp, name='bot_whatsapp'),
     path('clonar_despesas/', views.clonar_despesas_mes_anterior, name='clonar_despesas'),
     path('remover/<int:id>/', views.remover_transacao, name='remover_transacao'),
+    path('criar_meta/', views.criar_meta, name='criar_meta'),
 ]
 
 
