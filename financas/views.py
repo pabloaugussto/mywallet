@@ -15,31 +15,44 @@ from .forms import TransacaoForm, InvestimentoForm, MetaForm
 
 @login_required
 def index(request):
-    # 1. Filtros de Data
+    # 1. Filtros de Data (Isso continua igual, serve para a LISTA na tela)
     mes_atual = int(request.GET.get('mes', datetime.now().month))
     ano_atual = int(request.GET.get('ano', datetime.now().year))
 
-    transacoes = Transacao.objects.filter(
+    # Lista filtrada (Só mostra o que é deste mês)
+    transacoes_mes = Transacao.objects.filter(
         usuario=request.user,
         data__month=mes_atual,
         data__year=ano_atual
     ).order_by('-data')
 
-    # 2. Cálculos Básicos
-    receitas = transacoes.filter(categoria__tipo='R').aggregate(Sum('valor'))['valor__sum'] or 0
-    despesas = transacoes.filter(categoria__tipo='D').aggregate(Sum('valor'))['valor__sum'] or 0
-    saldo = receitas - despesas
+    # 2. Cálculos do MÊS (Para mostrar quanto entrou/saiu SÓ em Janeiro)
+    receitas_mes = transacoes_mes.filter(categoria__tipo='R').aggregate(Sum('valor'))['valor__sum'] or 0
+    despesas_mes = transacoes_mes.filter(categoria__tipo='D').aggregate(Sum('valor'))['valor__sum'] or 0
+    
+    # --- AQUI ESTÁ A MUDANÇA PRINCIPAL ---
+    
+    # Para o saldo ser REAL, precisamos somar TUDO desde o início, não só o mês atual.
+    # Criamos uma consulta nova sem filtro de data:
+    todas_transacoes = Transacao.objects.filter(usuario=request.user)
+    
+    receita_total_global = todas_transacoes.filter(categoria__tipo='R').aggregate(Sum('valor'))['valor__sum'] or 0
+    despesa_total_global = todas_transacoes.filter(categoria__tipo='D').aggregate(Sum('valor'))['valor__sum'] or 0
+    
+    # Esse é o saldo que vai aparecer no card (Agora ele não zera mais)
+    saldo_real = receita_total_global - despesa_total_global
+    
+    # -------------------------------------
 
-    # 3. Lógica do Salário (Soma das Receitas do Mês)
-    total_salario = receitas
+    # 3. Lógica do Salário (Mantive a do mês, mas você pode mudar se quiser)
+    total_salario = receitas_mes
 
-    # 4. Lógica das Metas
+    # 4. Lógica das Metas (Continua igual)
     metas = MetaFinanceira.objects.filter(usuario=request.user)
     lista_metas_progresso = []
 
     for meta in metas:
         acumulado = meta.transacoes.aggregate(Sum('valor'))['valor__sum'] or 0
-
         if meta.valor_alvo > 0:
             porcentagem = (acumulado / meta.valor_alvo) * 100
         else:
@@ -49,20 +62,17 @@ def index(request):
             'nome': meta.nome,
             'alvo': meta.valor_alvo,
             'acumulado': acumulado,
-            'porcentagem': min(porcentagem, 100), # Trava a barra visual em 100%
-            'porcentagem_real': porcentagem,      # Valor real para mostrar texto de "Estourou"
+            'porcentagem': min(porcentagem, 100),
+            'porcentagem_real': porcentagem,
             'cor': 'success' if porcentagem >= 100 else 'primary'
         })
 
-    # 5. Dados Extras (Cotação, Gráficos, etc - mantendo simples por enquanto)
-    # Se você tiver a lógica de investimentos ou gráficos, mantenha aqui.
-
     # Contexto
     context = {
-        'transacoes': transacoes,
-        'receitas': receitas,
-        'despesas': despesas,
-        'saldo': saldo,
+        'transacoes': transacoes_mes, # Manda só as do mês para a lista
+        'receitas': receitas_mes,     # Mostra receita do mês
+        'despesas': despesas_mes,     # Mostra despesa do mês
+        'saldo': saldo_real,          # <--- Manda o SALDO GLOBAL (Acumulado)
         'total_salario': total_salario,
         'lista_metas_progresso': lista_metas_progresso,
         'mes_atual': mes_atual,
