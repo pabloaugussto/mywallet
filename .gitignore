@@ -11,3 +11,4 @@ db.sqlite3
 
 # Arquivos de mídia (uploads de notas fiscais)
 media/
+.tmp.driveupload
